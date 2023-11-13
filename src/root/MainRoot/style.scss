@@ -1,0 +1,8 @@
+.layout {
+  max-width: 2160px;
+  margin: 0 auto;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

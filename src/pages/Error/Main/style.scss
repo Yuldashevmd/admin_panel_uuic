@@ -1,0 +1,37 @@
+.main {
+  background: #fff;
+  margin: 1.5rem 0.5rem;
+  height: 100%;
+  border-radius: 8px;
+  -webkit-box-shadow: -2px 5px 19px -13px rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: -2px 5px 19px -13px rgba(34, 60, 80, 0.2);
+  box-shadow: -2px 5px 19px -13px rgba(34, 60, 80, 0.2);
+  .ant-table-pagination {
+    margin-right: 1rem !important;
+  }
+  .ant-table {
+    overflow-x: scroll;
+    .ant-table-thead > tr > th {
+      background: var(--theadBg);
+    }
+    .ant-table-cell {
+      font-size: 12px;
+    }
+  }
+}
+.li {
+  border-bottom: 1px solid grey;
+  margin-top: 8px;
+  font-weight: bold;
+  span {
+    font-weight: normal;
+  }
+}
+.dictant__content {
+  height: fit-content;
+  max-height: 300px;
+  overflow: scroll;
+}
+.dictant__content::-webkit-scrollbar {
+  display: none;
+}
