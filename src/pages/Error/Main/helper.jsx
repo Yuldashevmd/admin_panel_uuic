@@ -1,29 +1,34 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Button, Input, Modal } from "antd";
+import { api } from "src/utils/api";
+
+const styleForStatus = {
+  color: "#64748B",
+};
 
 export const status = [
   {
-    label: "Позвонить",
+    label: <p style={styleForStatus}>Позвонить</p>,
     value: "will_call",
   },
   {
-    label: "Прошёл 1-этап",
+    label: <p style={styleForStatus}>Прошёл 1-этап</p>,
     value: "passed_first",
   },
   {
-    label: "Не прошёл 1-этап",
+    label: <p style={styleForStatus}>Не прошёл 1-этап</p>,
     value: "failed_first",
   },
   {
-    label: "Придёт",
+    label: <p style={styleForStatus}>Придёт</p>,
     value: "will_come",
   },
   {
-    label: "Пришел",
+    label: <p style={styleForStatus}>Пришел</p>,
     value: "came",
   },
   {
-    label: "Не выходит на связь",
+    label: <p style={styleForStatus}>Не выходит на связь</p>,
     value: "failed_call",
   },
   {
@@ -31,14 +36,6 @@ export const status = [
     value: "cancel",
   },
 ];
-
-export const dictantContent = (
-  <div className="dictant__content d-flex flex-column gap-1">
-    <a href="#">Content1</a>
-    <a href="#">Content2</a>
-    <a href="#">Content3</a>
-  </div>
-);
 
 // Modal download
 /**
@@ -61,4 +58,59 @@ export const DownloadModal = ({ is_open, close_modal }) => {
   );
 };
 
+/**
+ * @param {setLoading} boolean param for set loading status when fetching data
+ */
 // fetchAllUser
+export const fetchAllUsers = async (setLoading) => {
+  try {
+    setLoading(true);
+    const res = await api.get("/users/all");
+
+    setLoading(false);
+    return res.data;
+  } catch (err) {
+    console.log(err, "err");
+    setLoading(false);
+  }
+};
+
+/**
+ * @param {setDisabled} boolean param for set disable selects status when sending data
+ * @param {value} string param value sends value of select status
+ * @param {id} string param id is unique id that belongs to user
+ */
+// changeStatus
+export const changeStatus = async (value, id, setDisabled) => {
+  try {
+    setDisabled(true);
+    const res = await api.patch(`/users/update/${id}`, { status: value });
+
+    return { data: res.data, status: 200 };
+  } catch (err) {
+    console.log(err, "err");
+  } finally {
+    setDisabled(false);
+  }
+};
+
+/**
+ * @param {value} string or number and it sorting by name or phone data
+ * @param {status} string it also takes value of status and getting data from api
+ */
+// filterData
+export const filterData = async (value, status) => {
+  try {
+    let param;
+    if (!isNaN(value)) {
+      param = { name: "null", phone: value, status };
+    } else {
+      param = { name: value, phone: "null", status };
+    }
+    const res = await api.get("/users/findByFilter/users", { params: param });
+
+    return res.data;
+  } catch (err) {
+    console.log(err, "err");
+  }
+};

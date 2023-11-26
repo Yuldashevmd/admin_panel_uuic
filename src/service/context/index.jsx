@@ -1,12 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { createContext } from "react";
+import LoadingContext from "./loadingContext";
 
 export const Context = createContext();
 const MainContext = ({ children }) => {
-  const [token, setToken] = useState();
+  const [data, setData] = useState([]);
   return (
-    <Context.Provider value={[token, setToken]}>{children}</Context.Provider>
+    <Context.Provider value={[data, setData]}>
+      <LoadingContext>{children}</LoadingContext>
+    </Context.Provider>
   );
 };
 
