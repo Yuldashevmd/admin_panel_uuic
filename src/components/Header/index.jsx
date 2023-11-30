@@ -82,6 +82,7 @@ const Header = () => {
           allowClear
           type="search"
           ref={inputRef}
+          onPressEnter={handleFilter}
           placeholder={`Поиск по Ф.И.О или по номеру телефона`}
           style={{ width: "100%", maxWidth: "500px" }}
           prefix={

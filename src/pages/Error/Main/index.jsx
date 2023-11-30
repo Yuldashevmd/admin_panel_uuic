@@ -1,23 +1,38 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Popover, Table } from "antd";
 import "./style.scss";
-import { Avatar, Button, Input, Select } from "antd";
+import { Avatar, Button, Select } from "antd";
 import moment from "moment";
 import { Check, Download, Eye, User, X } from "react-feather";
 import { useState } from "react";
-import { DownloadModal, changeStatus, fetchAllUsers, status } from "./helper";
+import { changeStatus, fetchAllUsers, status } from "./helper";
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useData from "src/service/hooks/useData";
 import useLoading from "src/service/hooks/useLoading";
+import { DownloadModal } from "src/components/Upload";
+import CommentModal from "src/components/CommentModal";
+
+const styleStatus = {
+  padding: "1em 1rem",
+  color: "#fff",
+  borderRadius: "8px",
+  background: "grey",
+  fontWeight: "600",
+  textAlign: "center",
+  letterSpacing: "1.5px",
+};
 
 const Main = () => {
   const role = sessionStorage.getItem("user_role");
+  const [afterSendFile, setAfterSendFile] = useState(false);
+  const [userId, setUserId] = useState(null);
   const { data, setData } = useData();
   const [disabled, setDisabled] = useState(false);
   const { loading, setLoading } = useLoading();
   const [downloadModal, setDownloadModal] = useState(false);
+  const [commentModal, setCommentModal] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -212,7 +227,9 @@ const Main = () => {
                 icon={<Download size={15} />}
                 type="primary"
                 className="d-flex align-center p-1"
-                onClick={() => setDownloadModal(true)}
+                onClick={() => {
+                  setDownloadModal(true), setUserId(record?.id);
+                }}
               >
                 Загрузить
               </Button>
@@ -230,27 +247,14 @@ const Main = () => {
           switch (t) {
             case "will_call":
               return (
-                <p
-                  style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
-                    background: "grey",
-                    fontWeight: "600",
-                  }}
-                >
-                  Позвонить
-                </p>
+                <p style={{ ...styleStatus, background: "grey" }}>Позвонить</p>
               );
             case "passed_first":
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "steelblue",
-                    fontWeight: "600",
                   }}
                 >
                   Прошёл 1-этап
@@ -260,11 +264,8 @@ const Main = () => {
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "crimson",
-                    fontWeight: "600",
                   }}
                 >
                   Не прошёл 1-этап
@@ -274,11 +275,8 @@ const Main = () => {
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "orange",
-                    fontWeight: "600",
                   }}
                 >
                   Придёт
@@ -288,11 +286,8 @@ const Main = () => {
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "green",
-                    fontWeight: "600",
                   }}
                 >
                   Пришел
@@ -302,11 +297,8 @@ const Main = () => {
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "red",
-                    fontWeight: "600",
                   }}
                 >
                   Не выходит на связь
@@ -316,11 +308,8 @@ const Main = () => {
               return (
                 <p
                   style={{
-                    padding: "1em 1rem",
-                    color: "#fff",
-                    borderRadius: "8px",
+                    ...styleStatus,
                     background: "red",
-                    fontWeight: "600",
                   }}
                 >
                   Отказ
@@ -347,9 +336,21 @@ const Main = () => {
       title: "Примечание",
       dataIndex: "comment",
       key: "comment",
-      render: (t) => {
-        if (role == "monitor") return <p>{t}</p>;
-        return <Input.TextArea autosize={{ minRows: 2, maxRows: 6 }} />;
+      render: (t, record) => {
+        if (role == "monitor")
+          return <p style={{ textAlign: "center" }}>{t ? t : "Нет"}</p>;
+
+        return t ? (
+          t
+        ) : (
+          <Button
+            onClick={() => {
+              setCommentModal(true), setUserId(record?.id);
+            }}
+          >
+            Оставить отзыв
+          </Button>
+        );
       },
     },
   ];
@@ -366,7 +367,7 @@ const Main = () => {
         })
       )
     );
-  }, []);
+  }, [afterSendFile]);
 
   return (
     <main className="main">
@@ -397,7 +398,18 @@ const Main = () => {
         }}
       />
       {/* modal download*/}
-      <DownloadModal is_open={downloadModal} close_modal={setDownloadModal} />
+      <DownloadModal
+        is_open={downloadModal}
+        close_modal={setDownloadModal}
+        userId={userId}
+        setAfterSendFile={setAfterSendFile}
+      />
+      {/* modal comment */}
+      <CommentModal
+        open={commentModal}
+        close={setCommentModal}
+        userId={userId}
+      />
       <ToastContainer />
     </main>
   );

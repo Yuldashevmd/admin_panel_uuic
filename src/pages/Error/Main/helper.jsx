@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Button, Input, Modal } from "antd";
+
 import { api } from "src/utils/api";
 
 const styleForStatus = {
@@ -37,29 +37,8 @@ export const status = [
   },
 ];
 
-// Modal download
 /**
- *
- * @param {is_open} boolean parametr for opening modal
- * @param {close_modal} boolean parametr for closing modal
- * @returns modal component
- */
-export const DownloadModal = ({ is_open, close_modal }) => {
-  return (
-    <Modal
-      width={"580px"}
-      title={"Загрузите файлы в формате JPG или PDF"}
-      open={is_open}
-      footer={<Button type="primary">Загрузить диктант</Button>}
-      onCancel={() => close_modal(false)}
-    >
-      <Input type="file" style={{ height: "50px" }} />
-    </Modal>
-  );
-};
-
-/**
- * @param {setLoading} boolean param for set loading status when fetching data
+ * @param {boolean} setLoading for set loading status when fetching data
  */
 // fetchAllUser
 export const fetchAllUsers = async (setLoading) => {
@@ -76,9 +55,9 @@ export const fetchAllUsers = async (setLoading) => {
 };
 
 /**
- * @param {setDisabled} boolean param for set disable selects status when sending data
- * @param {value} string param value sends value of select status
- * @param {id} string param id is unique id that belongs to user
+ * @param {boolean}  setDisabled param for set disable selects status when sending data
+ * @param {string}  value param value sends value of select status
+ * @param {string}  id param id is unique id that belongs to user
  */
 // changeStatus
 export const changeStatus = async (value, id, setDisabled) => {
@@ -95,8 +74,8 @@ export const changeStatus = async (value, id, setDisabled) => {
 };
 
 /**
- * @param {value} string or number and it sorting by name or phone data
- * @param {status} string it also takes value of status and getting data from api
+ * @param {string}  value or number and it sorting by name or phone data
+ * @param {string}  status it also takes value of status and getting data from api
  */
 // filterData
 export const filterData = async (value, status) => {
