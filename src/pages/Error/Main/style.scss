@@ -35,3 +35,52 @@
 .dictant__content::-webkit-scrollbar {
   display: none;
 }
+
+// modal style's
+.ant-modal-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.modal-header-text {
+  text-align: center;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+.custom-file-input {
+  display: none;
+}
+
+.custom-file-label {
+  border: 2px solid #e2e8f0;
+  border-radius: 2px;
+  width: 80%;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  &:hover {
+    border-color: #d7dfed;
+    -webkit-box-shadow: -1px -1px 8px -5px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: -1px -1px 8px -5px rgba(34, 60, 80, 0.2);
+    box-shadow: -1px -1px 8px -5px rgba(34, 60, 80, 0.2);
+  }
+  &:hover p {
+    background: #d7dfed;
+  }
+  p {
+    width: 30%;
+    height: 100%;
+    background: #e2e8f0;
+    transition: all 0.2s linear;
+  }
+  span {
+    width: 70%;
+    height: 100%;
+    padding: 1rem;
+    background: #fff;
+  }
+}

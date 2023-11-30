@@ -1,27 +1,37 @@
-import { Divider, Form } from "antd";
+import { Button, Divider, Form, Input, notification } from "antd";
 import "./style.scss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // components
-import InputGen from "src/service/Generics/Input";
-import ButtonGen from "src/service/Generics/Button";
-import { useContext } from "react";
-import { Context } from "src/service/context";
+
+import { api } from "src/utils/api";
+import { ToastContainer } from "react-toastify";
 
 const Login = () => {
-  const [setToken] = useContext(Context);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   // handleFinish
-  const handleFinish = (values) => {
-    setLoading(true);
-    sessionStorage.setItem("role", values.role);
-    sessionStorage.setItem("access_token", values.role);
-    setToken("access_token");
-    navigate("/");
-    setLoading(false);
+  const handleFinish = async (values) => {
+    try {
+      setLoading(true);
+      const res = await api.post("/users/login", values);
+      res.data.status == 200 &&
+        notification.success({
+          message: "Success!",
+          placement: "bottomRight",
+          icon: null,
+          duration: 2,
+        }),
+        sessionStorage.setItem("access_token", res.data.token);
+      sessionStorage.setItem("user_role", res.data.role);
+      navigate("/");
+    } catch (err) {
+      console.log(err, "err");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,36 +48,39 @@ const Login = () => {
           form={form}
           layout="vertical"
         >
-          <Form.Item label="Telefon raqam" name="phone">
-            <InputGen
+          <Form.Item label="Имя пользователя" name="name">
+            <Input
               disabled={loading}
-              placeholder={"Telefon raqam"}
+              placeholder={"Имя пользователя"}
               width={"100%"}
               id="enterPhone"
             />
           </Form.Item>
-          <Form.Item label="Parol" name="password">
-            <InputGen
+          <Form.Item label="Пароль" name="password">
+            <Input
               disabled={loading}
               type="password"
-              placeholder={"Parol"}
+              placeholder={"Пароль"}
               width={"100%"}
               id="enterPassword"
             />
           </Form.Item>
 
           <div className="w-100 m-y-2">
-            <ButtonGen
+            <Button
+              block
+              size="large"
               loading={loading}
               htmlType="submit"
               form="loginForm"
               type="primary"
             >
               Войти
-            </ButtonGen>
+            </Button>
           </div>
         </Form>
       </div>
+      <ToastContainer />
     </div>
   );
 };
