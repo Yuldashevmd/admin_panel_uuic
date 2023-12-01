@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Popover, Table } from "antd";
+import { useDispatch } from "react-redux";
 import "./style.scss";
 import { Avatar, Button, Select } from "antd";
 import moment from "moment";
@@ -13,6 +14,7 @@ import useData from "src/service/hooks/useData";
 import useLoading from "src/service/hooks/useLoading";
 import { DownloadModal } from "src/components/Upload";
 import CommentModal from "src/components/CommentModal";
+import { updateUsers } from "src/service/store/userSlicer";
 
 const styleStatus = {
   padding: "1em 1rem",
@@ -25,6 +27,7 @@ const styleStatus = {
 };
 
 const Main = () => {
+  const dispatch = useDispatch();
   const role = sessionStorage.getItem("user_role");
   const [afterSendFile, setAfterSendFile] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -356,17 +359,24 @@ const Main = () => {
   ];
 
   useEffect(() => {
-    fetchAllUsers(setLoading).then((res) =>
-      setData(
-        res?.map((item, index) => {
-          return {
-            key: item.id,
-            index: index + 1,
-            ...item,
-          };
-        })
-      )
-    );
+    fetchAllUsers(setLoading).then((res) => {
+      dispatch(
+        updateUsers(
+          res?.map((item, index) => {
+            return { index: index + 1, ...item };
+          })
+        )
+      ),
+        setData(
+          res?.map((item, index) => {
+            return {
+              key: item.id,
+              index: index + 1,
+              ...item,
+            };
+          })
+        );
+    });
   }, [afterSendFile]);
 
   return (

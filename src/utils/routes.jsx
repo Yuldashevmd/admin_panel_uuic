@@ -1,13 +1,11 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react-refresh/only-export-components */
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ErrorBoundary from "src/pages/Error";
 
 // lazy imports
-const Login = lazy(() => import(`src/components/Auth/Login`));
-const Layout = lazy(() => import(`src/root/MainRoot`));
-const Main = lazy(() => import(`src/pages/Error/Main`));
+export const Login = lazy(() => import(`src/components/Auth/Login`));
+export const Layout = lazy(() => import(`src/root/MainRoot`));
+export const Main = lazy(() => import(`src/pages/Error/Main`));
 
 // Access by roles
 const RoleAccess = ({ children }) => {
@@ -19,7 +17,7 @@ const RoleAccess = ({ children }) => {
 };
 
 // routes
-export const routes = createBrowserRouter([
+export const Routes = createBrowserRouter([
   { path: "/login", element: <Login /> },
   {
     path: "/",

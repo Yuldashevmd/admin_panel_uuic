@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { routes } from "./utils/routes";
+import { Routes } from "./utils/routes";
 import { Spin } from "antd";
 import "./styles/globalStyles.css";
 import { Provider } from "react-redux";
@@ -21,7 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     >
       <Provider store={store}>
         <MainContext>
-          <RouterProvider router={routes} />
+          <RouterProvider router={Routes} />
         </MainContext>
       </Provider>
     </Suspense>
