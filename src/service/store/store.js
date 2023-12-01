@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import sampleSlicer from "./sampleSlicer";
+import userSlicer from "./userSlicer";
 
 export const store = configureStore({
   reducer: {
-    sample:sampleSlicer
+    users: userSlicer,
   },
 });

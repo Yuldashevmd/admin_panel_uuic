@@ -1,4 +1,5 @@
 import "./style.scss";
+import { useSelector } from "react-redux";
 import Logo from "src/assets/svg/customer-service-fill.svg";
 import ForwardIcon from "src/assets/svg/share-forward-line.svg";
 import { Search } from "react-feather";
@@ -8,8 +9,10 @@ import { useRef } from "react";
 import { useState } from "react";
 import { filterData } from "src/pages/Error/Main/helper";
 import useLoading from "src/service/hooks/useLoading";
+import DownloadExcel from "../Excel";
 
 const Header = () => {
+  const users = useSelector((state) => state.users.users);
   const inputRef = useRef();
   const [selectStatus, setSelectStatus] = useState(null);
   const { setData } = useData();
@@ -111,6 +114,7 @@ const Header = () => {
         </div>
         <section className=" d-flex justify-end align-center gap-x-1">
           <Button
+            onClick={() => DownloadExcel(users)}
             className="d-flex align-center"
             icon={<img src={ForwardIcon} alt="excel" />}
           >
