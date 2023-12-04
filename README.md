@@ -1,6 +1,6 @@
 #project-template
--Basic template for ant+vite project
--it has redux toolkit and multilanguage
+-Admin panel for HRbot 
+
 
 #start
 -npm install
