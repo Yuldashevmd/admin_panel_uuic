@@ -200,13 +200,19 @@ const Main = () => {
             {t ? (
               <Popover
                 trigger={"click"}
-                content={
-                  <div className="dictant__content d-flex flex-column gap-1">
-                    <a href={t} target="_blank" rel="noreferrer">
-                      {record?.nameFile}
+                content={record?.images.map((image, index) => (
+                  <div key={index}>
+                    <a
+                      href={image?.image_link}
+                      rel="noreferrer"
+                      target="_blank"
+                      alt="img"
+                    >
+                      {index + 1}-{" "}
+                      {image?.name_file ? image?.name_file : "Диктант"}
                     </a>
                   </div>
-                }
+                ))}
                 placement="leftTop"
               >
                 <Button

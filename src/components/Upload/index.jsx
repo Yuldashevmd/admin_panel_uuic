@@ -48,7 +48,7 @@ export const DownloadModal = ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("user_id", userId);
-      formData.append("name_file ", JSON.stringify(fileName));
+      formData.append("name_file", fileName);
       try {
         const body = formData;
         const res = await api.post("/admin/addDictation", body, {

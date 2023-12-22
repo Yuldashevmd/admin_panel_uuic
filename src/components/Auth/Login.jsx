@@ -16,7 +16,7 @@ const Login = () => {
   const handleFinish = async (values) => {
     try {
       setLoading(true);
-      const res = await api.post("/users/login", values);
+      const res = await api.post("/admin/login", values);
       res.data.status == 200 &&
         notification.success({
           message: "Success!",
