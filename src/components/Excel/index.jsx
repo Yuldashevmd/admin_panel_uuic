@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { fetchAllUsers } from "src/pages/Error/Main/helper";
 
 const checkStatus = (status) => {
   const statusMap = {
@@ -13,7 +14,11 @@ const checkStatus = (status) => {
   return statusMap[status] || "Позвонить";
 };
 
-const DownloadExcel = async (users = []) => {
+const DownloadExcel = async (setLoading, total) => {
+  const users = await fetchAllUsers(setLoading, 1, total).then(
+    (res) => res?.results
+  );
+
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Sheet 1");
 

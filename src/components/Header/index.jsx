@@ -1,5 +1,4 @@
 import "./style.scss";
-import { useSelector } from "react-redux";
 import Logo from "src/assets/svg/customer-service-fill.svg";
 import ForwardIcon from "src/assets/svg/share-forward-line.svg";
 import { Search } from "react-feather";
@@ -10,9 +9,10 @@ import { useState } from "react";
 import { filterData } from "src/pages/Error/Main/helper";
 import useLoading from "src/service/hooks/useLoading";
 import DownloadExcel from "../Excel";
+import usePagination from "src/service/hooks/usePagination";
 
 const Header = () => {
-  const users = useSelector((state) => state.users.users);
+  const { pagination, setPagination } = usePagination();
   const inputRef = useRef();
   const [selectStatus, setSelectStatus] = useState(null);
   const { setData } = useData();
@@ -57,8 +57,17 @@ const Header = () => {
     setLoading(true);
     const value = inputRef?.current.input.value;
     const res = await filterData(value, selectStatus);
+    setPagination({
+      current: +res?.pagination.currentPage,
+      pageSize: +res?.pagination.pageSize,
+      total: +res?.pagination.totalItems,
+    });
     setData(
-      res.map((item, index) => ({ ...item, key: item.id, index: index + 1 }))
+      res?.results.map((item, index) => ({
+        ...item,
+        key: item.id,
+        index: index + 1,
+      }))
     );
     setLoading(false);
   };
@@ -69,7 +78,11 @@ const Header = () => {
     const res = await filterData(value, e);
     setSelectStatus(e);
     setData(
-      res.map((item, index) => ({ ...item, key: item.id, index: index + 1 }))
+      res?.results.map((item, index) => ({
+        ...item,
+        key: item.id,
+        index: index + 1,
+      }))
     );
     setLoading(false);
   };
@@ -114,7 +127,7 @@ const Header = () => {
         </div>
         <section className=" d-flex justify-end align-center gap-x-1">
           <Button
-            onClick={() => DownloadExcel(users)}
+            onClick={() => DownloadExcel(setLoading, pagination.total)}
             className="d-flex align-center"
             icon={<img src={ForwardIcon} alt="excel" />}
           >

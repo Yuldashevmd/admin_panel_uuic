@@ -15,6 +15,7 @@ import useLoading from "src/service/hooks/useLoading";
 import { DownloadModal } from "src/components/Upload";
 import CommentModal from "src/components/CommentModal";
 import { updateUsers } from "src/service/store/userSlicer";
+import usePagination from "src/service/hooks/usePagination";
 
 const styleStatus = {
   padding: "1em 1rem",
@@ -36,11 +37,7 @@ const Main = () => {
   const { loading, setLoading } = useLoading();
   const [downloadModal, setDownloadModal] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: null,
-  });
+  const { pagination, setPagination } = usePagination();
   // handleChangeStatus
   const handleChangeStatus = async (e, { id }) => {
     const { status } = await changeStatus(e, id, setDisabled);
@@ -203,13 +200,19 @@ const Main = () => {
             {t ? (
               <Popover
                 trigger={"click"}
-                content={
-                  <div className="dictant__content d-flex flex-column gap-1">
-                    <a href={t} target="_blank" rel="noreferrer">
-                      {record?.nameFile}
+                content={record?.images.map((image, index) => (
+                  <div key={index}>
+                    <a
+                      href={image?.image_link}
+                      rel="noreferrer"
+                      target="_blank"
+                      alt="img"
+                    >
+                      {index + 1}-{" "}
+                      {image?.name_file ? image?.name_file : "Диктант"}
                     </a>
                   </div>
-                }
+                ))}
                 placement="leftTop"
               >
                 <Button
@@ -337,14 +340,40 @@ const Main = () => {
     },
     {
       title: "Примечание",
-      dataIndex: "comment",
-      key: "comment",
+      dataIndex: "Comment",
+      key: "Comment",
       render: (t, record) => {
         if (role == "monitor")
-          return <p style={{ textAlign: "center" }}>{t ? t : "Нет"}</p>;
+          return t ? (
+            <Popover
+              placement="left"
+              trigger={"click"}
+              title={"Отзыв"}
+              content={
+                <div style={{ maxWidth: "500px", width: "100%" }}>
+                  <p style={{ wordWrap: "break-word" }}>{t}</p>
+                </div>
+              }
+            >
+              <Button>Посмотреть отзыв</Button>
+            </Popover>
+          ) : (
+            "Нет отзыва"
+          );
 
         return t ? (
-          t
+          <Popover
+            placement="left"
+            trigger={"click"}
+            title={"Отзыв"}
+            content={
+              <div style={{ maxWidth: "500px", width: "100%" }}>
+                <p style={{ wordWrap: "break-word" }}>{t}</p>
+              </div>
+            }
+          >
+            <Button>Посмотреть отзыв</Button>
+          </Popover>
         ) : (
           <Button
             onClick={() => {
@@ -358,25 +387,35 @@ const Main = () => {
     },
   ];
 
-  useEffect(() => {
-    fetchAllUsers(setLoading).then((res) => {
+  // getUsers
+  const getUsers = (page, pageSize) => {
+    fetchAllUsers(setLoading, page, pageSize).then((res) => {
       dispatch(
         updateUsers(
-          res?.map((item, index) => {
+          res?.results.map((item, index) => {
             return { index: index + 1, ...item };
           })
         )
       ),
-        setData(
-          res?.map((item, index) => {
-            return {
-              key: item.id,
-              index: index + 1,
-              ...item,
-            };
-          })
-        );
+        setPagination({
+          current: +res?.pagination.currentPage,
+          pageSize: +res?.pagination.pageSize,
+          total: +res?.pagination.totalItems,
+        });
+      setData(
+        res?.results.map((item, index) => {
+          return {
+            key: item.id,
+            index: index + 1,
+            ...item,
+          };
+        })
+      );
     });
+  };
+
+  useEffect(() => {
+    getUsers(pagination.current, pagination.pageSize);
   }, [afterSendFile]);
 
   return (
@@ -394,16 +433,10 @@ const Main = () => {
           showSizeChanger: true,
           showTotal: (total) => `Общий ${total} шт.`,
           onChange: (page, pageSize) => {
-            setPagination({
-              current: page,
-              pageSize,
-            });
+            getUsers(page, pageSize);
           },
           onShowSizeChange: (current, size) => {
-            setPagination({
-              ...pagination,
-              pageSize: size,
-            });
+            getUsers(current, size);
           },
         }}
       />
@@ -416,6 +449,8 @@ const Main = () => {
       />
       {/* modal comment */}
       <CommentModal
+        getUsers={getUsers}
+        pagination={pagination}
         open={commentModal}
         close={setCommentModal}
         userId={userId}

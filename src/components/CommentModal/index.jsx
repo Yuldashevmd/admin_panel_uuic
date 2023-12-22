@@ -1,16 +1,23 @@
 import ModalGen from "src/service/generic/modal";
-// import { api } from "src/utils/api";
+import { api } from "src/utils/api";
 import { Input, Form } from "antd";
+import { toast } from "react-toastify";
 
-const CommentModal = ({ open, close, userId }) => {
+const CommentModal = ({ open, close, userId, getUsers, pagination }) => {
   const [form] = Form.useForm();
 
   // sendComment
   const sendComment = async (values) => {
+    const body = {
+      user_id: userId,
+      comment: values.comment,
+    };
     try {
-      // const res = await api.post("");
-      console.log({ comment: values.comment, userId: userId });
-      form.setFieldValue("comment", null);
+      const res = await api.post("/admin/addComment", body);
+      res.status == 201 &&
+        (getUsers(pagination.current, pagination.pageSize),
+        toast.success("Сохранено", { position: "bottom-right" }));
+      close(false);
     } catch (err) {
       console.log(err, "err");
     }
