@@ -37,12 +37,15 @@ export const status = [
 
 /**
  * @param {boolean} setLoading for set loading status when fetching data
+ * @param {Object} pagination for getting data with pagination
  */
 // fetchAllUser
-export const fetchAllUsers = async (setLoading) => {
+export const fetchAllUsers = async (setLoading, page, pageSize) => {
   try {
     setLoading(true);
-    const res = await api.get("/users/all");
+    const res = await api.get("/users/all", {
+      params: { pageNumber: page, pageSize: pageSize },
+    });
 
     setLoading(false);
     return res.data;
@@ -61,7 +64,7 @@ export const fetchAllUsers = async (setLoading) => {
 export const changeStatus = async (value, id, setDisabled) => {
   try {
     setDisabled(true);
-    const res = await api.patch(`/users/update/${id}`, { status: value });
+    const res = await api.patch(`/admin/updateStatus/${id}`, { status: value });
 
     return { data: res.data, status: 200 };
   } catch (err) {

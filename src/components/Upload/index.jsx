@@ -48,9 +48,10 @@ export const DownloadModal = ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("user_id", userId);
+      formData.append("name_file ", JSON.stringify(fileName));
       try {
         const body = formData;
-        const res = await api.post("/users/createimage", body, {
+        const res = await api.post("/admin/addDictation", body, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export const api = axios.create({
-  baseURL: `https://api.ccenter.uz/api/v1/`,
+  baseURL: `https://apihr.ccenter.uz/api/v1/`,
 });
 
 // Interceptor for all api request
