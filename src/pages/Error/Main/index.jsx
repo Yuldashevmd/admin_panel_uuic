@@ -197,22 +197,26 @@ const Main = () => {
       render: (t, record) => {
         return (
           <div className="d-flex align-center flex-column gap-1">
-            {t ? (
+            {record?.images.length > 0 ? (
               <Popover
                 trigger={"click"}
-                content={record?.images.map((image, index) => (
-                  <div key={index}>
-                    <a
-                      href={image?.image_link}
-                      rel="noreferrer"
-                      target="_blank"
-                      alt="img"
-                    >
-                      {index + 1}-{" "}
-                      {image?.name_file ? image?.name_file : "Диктант"}
-                    </a>
-                  </div>
-                ))}
+                content={record?.images.map((image, index) =>
+                  image?.image_link !== null ? (
+                    <div key={index}>
+                      <a
+                        href={image?.image_link}
+                        rel="noreferrer"
+                        target="_blank"
+                        alt="img"
+                      >
+                        {index + 1}-{" "}
+                        {image?.name_file ? image?.name_file : "Диктант"}
+                      </a>
+                    </div>
+                  ) : (
+                    "Нет загружено!"
+                  )
+                )}
                 placement="leftTop"
               >
                 <Button
