@@ -13,10 +13,14 @@
     padding: 1rem;
     p {
       letter-spacing: 0.8px;
+      font-weight: 600;
     }
   }
   .filter {
     width: 70%;
+    .filter__select {
+      width: inherit;
+    }
     .ant-input {
       height: 32px;
     }
@@ -33,6 +37,7 @@
     }
     p {
       font-size: 14px;
+      font-weight: 600;
     }
   }
   .excel__export {

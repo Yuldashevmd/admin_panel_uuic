@@ -11,18 +11,23 @@
   }
   .ant-table {
     overflow-x: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
     .ant-table-thead > tr > th {
       background: var(--theadBg);
+      font-weight: 800;
+      font-size: 14px;
     }
     .ant-table-cell {
       font-size: 12px;
+      font-weight: 600;
     }
   }
 }
 .li {
   border-bottom: 1px solid grey;
   margin-top: 8px;
-  font-weight: bold;
   span {
     font-weight: normal;
   }
@@ -82,5 +87,22 @@
     height: 100%;
     padding: 1rem;
     background: #fff;
+  }
+}
+
+// status_select
+.status_select {
+  color: #fff;
+  width: 200px;
+  border: 1px solid lightgrey;
+  height: 35px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #1a7dff;
   }
 }

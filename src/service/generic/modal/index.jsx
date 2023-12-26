@@ -11,10 +11,21 @@ import { Modal, Button } from "antd";
  * @returns modal component
  */
 
-const ModalGen = ({ open, close, title, buttonText, form, children }) => {
+const ModalGen = ({
+  open,
+  close,
+  title,
+  buttonText,
+  form,
+  children,
+  setRecord,
+}) => {
   const closeModal = () => {
     close(false);
     form.setFieldValue("comment", null);
+    if (setRecord !== null) {
+      setRecord(false);
+    }
   };
   return (
     <Modal
