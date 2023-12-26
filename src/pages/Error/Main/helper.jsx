@@ -107,9 +107,21 @@ export const filterData = async (value, status, pagination, pageSize) => {
     try {
       let param;
       if (!isNaN(value)) {
-        param = { name: "null", phone: value, status, pageNumber: 1, pageSize };
+        param = {
+          name: "null",
+          phone: value,
+          status,
+          pageNumber: 1,
+          pageSize,
+        };
       } else {
-        param = { name: value, phone: "null", status, pageNumber: 1, pageSize };
+        param = {
+          name: value,
+          phone: "null",
+          status,
+          pageNumber: 1,
+          pageSize,
+        };
       }
       const res = await api.get("/users/findByFilter/users", { params: param });
 

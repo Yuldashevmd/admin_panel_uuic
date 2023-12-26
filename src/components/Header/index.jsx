@@ -94,18 +94,47 @@ const Header = () => {
   };
 
   const handleChangeStatus = async (e) => {
-    setLoading(true);
-    const value = inputRef?.current.input.value;
-    const res = await filterData(value, e);
-    setSelectStatus(e);
-    setData(
-      res?.results.map((item, index) => ({
-        ...item,
-        key: item.id,
-        index: index + 1,
-      }))
-    );
-    setLoading(false);
+    if (e !== "all") {
+      setLoading(true);
+      const value = inputRef?.current.input.value;
+      const res = await filterData(value, e, null, pagination.total);
+      setSelectStatus(e);
+      setData(
+        res?.results.map((item, index) => ({
+          ...item,
+          key: item.id,
+          index: index + 1,
+        }))
+      );
+      setPagination({
+        current: +res?.pagination.currentPage,
+        pageSize: +res?.pagination.pageSize,
+        total: +res?.pagination.totalItems,
+      });
+      setLoading(false);
+    } else {
+      setLoading(true);
+      const pagination = {
+        current: get("currentPage"),
+        pageSize: get("pageSize"),
+      };
+      const value = inputRef?.current.input.value;
+      const res = await filterData(value, e, pagination);
+      setSelectStatus(e);
+      setData(
+        res?.results.map((item, index) => ({
+          ...item,
+          key: item.id,
+          index: index + 1,
+        }))
+      );
+      setPagination({
+        current: +res?.pagination.currentPage,
+        pageSize: +res?.pagination.pageSize,
+        total: +res?.pagination.totalItems,
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -149,7 +178,9 @@ const Header = () => {
         <section className=" d-flex justify-end align-center gap-x-1">
           <Button
             style={{ background: "green", color: "#fff" }}
-            onClick={() => DownloadExcel(setLoading, pagination.total)}
+            onClick={() =>
+              DownloadExcel(setLoading, pagination.total, selectStatus)
+            }
             className="d-flex align-center"
             icon={<Download size={16} />}
           >
