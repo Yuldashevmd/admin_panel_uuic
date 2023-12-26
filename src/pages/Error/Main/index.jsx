@@ -2,13 +2,12 @@
 import { Popover, Table } from "antd";
 import { useDispatch } from "react-redux";
 import "./style.scss";
-import { Avatar, Button, Select } from "antd";
+import { Avatar, Button, Tooltip } from "antd";
 import moment from "moment";
-import { Check, Download, Eye, User, X } from "react-feather";
-import { useState } from "react";
-import { changeStatus, fetchAllUsers, status } from "./helper";
+import { Check, Download, Edit3, Eye, Trash, User, X } from "react-feather";
+import { changeStatus, deleteComment, fetchAllUsers, status } from "./helper";
 import { ToastContainer } from "react-toastify";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useData from "src/service/hooks/useData";
 import useLoading from "src/service/hooks/useLoading";
@@ -16,18 +15,125 @@ import { DownloadModal } from "src/components/Upload";
 import CommentModal from "src/components/CommentModal";
 import { updateUsers } from "src/service/store/userSlicer";
 import usePagination from "src/service/hooks/usePagination";
+import { useLocalStorage } from "src/service/hooks/useLocalStorage";
 
 const styleStatus = {
   padding: "1em 1rem",
   color: "#fff",
   borderRadius: "8px",
   background: "grey",
-  fontWeight: "600",
+  fontWeight: "700",
   textAlign: "center",
   letterSpacing: "1.5px",
 };
 
+// checkColor
+const checkColor = (lang) => {
+  switch (lang) {
+    case "Средний":
+      return (
+        <span style={{ color: "#C1A40B", fontWeight: "600" }}>
+          {lang?.slice(0, 4)}
+        </span>
+      );
+    case "Свободный":
+      return (
+        <span style={{ color: "#1E8E14", fontWeight: "600" }}>
+          {lang?.slice(0, 4)}
+        </span>
+      );
+    case "Начальный":
+      return (
+        <span style={{ color: "#D13D3D", fontWeight: "600" }}>
+          {lang?.slice(0, 4)}
+        </span>
+      );
+    default:
+      return (
+        <span style={{ color: "#1E8E14", fontWeight: "600" }}>
+          {lang?.slice(0, 4)}
+        </span>
+      );
+  }
+};
+// checkCase
+const checkCase = (t) => {
+  switch (t) {
+    case "will_call":
+      return <p style={{ ...styleStatus, background: "grey" }}>Позвонить</p>;
+    case "passed_first":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "steelblue",
+          }}
+        >
+          Прошёл 1-этап
+        </p>
+      );
+    case "failed_first":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "crimson",
+          }}
+        >
+          Не прошёл 1-этап
+        </p>
+      );
+    case "will_come":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "orange",
+          }}
+        >
+          Придёт
+        </p>
+      );
+    case "came":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "green",
+          }}
+        >
+          Пришел
+        </p>
+      );
+    case "failed_call":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "red",
+          }}
+        >
+          Не выходит на связь
+        </p>
+      );
+    case "cancel":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "red",
+          }}
+        >
+          Отказ
+        </p>
+      );
+    default:
+      return "Позвонить";
+  }
+};
+
 const Main = () => {
+  const { set } = useLocalStorage();
   const dispatch = useDispatch();
   const role = sessionStorage.getItem("user_role");
   const [afterSendFile, setAfterSendFile] = useState(false);
@@ -38,16 +144,50 @@ const Main = () => {
   const [downloadModal, setDownloadModal] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const { pagination, setPagination } = usePagination();
+  const [record, setRecord] = useState(null);
+
   // handleChangeStatus
   const handleChangeStatus = async (e, { id }) => {
-    const { status } = await changeStatus(e, id, setDisabled);
+    const { status } = await changeStatus(e.target.value, id, setDisabled);
     status === 200 &&
-      toast.success("Изменено!", {
+      (toast.success("Изменено!", {
         position: "bottom-right",
         hideProgressBar: false,
-      });
+      }),
+      getUsers(pagination.current, pagination.pageSize));
   };
 
+  // handleDeleteComment
+  const handleDeleteComment = async (id) => {
+    const { status } = await deleteComment(id);
+    status === 200 &&
+      toast.success("Удалено!", {
+        position: "bottom-right",
+        hideProgressBar: false,
+      }),
+      getUsers(pagination.current, pagination.pageSize);
+  };
+  // selectBgStyle
+  const styleSelect = (t) => {
+    switch (t) {
+      case "will_call":
+        return { background: "grey" };
+      case "passed_first":
+        return { background: "steelblue" };
+      case "failed_first":
+        return { background: "crimson" };
+      case "will_come":
+        return { background: "orange" };
+      case "came":
+        return { background: "green" };
+      case "failed_call":
+        return { background: "red" };
+      case "cancel":
+        return { background: "red" };
+      default:
+        return { background: "grey" };
+    }
+  };
   // Col for table
   const columns = [
     {
@@ -70,7 +210,7 @@ const Main = () => {
       dataIndex: "name",
       key: "name",
       align: "center",
-      render: (t) => <strong>{t}</strong>,
+      render: (t) => <p style={{ fontWeight: "800" }}>{t}</p>,
     },
     {
       title: "Дата рождения",
@@ -103,34 +243,6 @@ const Main = () => {
       key: "language",
       align: "center",
       render: (t, record) => {
-        const checkColor = (lang) => {
-          switch (lang) {
-            case "Средний":
-              return (
-                <span style={{ color: "#C1A40B", fontWeight: "600" }}>
-                  {lang?.slice(0, 4)}
-                </span>
-              );
-            case "Свободный":
-              return (
-                <span style={{ color: "#1E8E14", fontWeight: "600" }}>
-                  {lang?.slice(0, 4)}
-                </span>
-              );
-            case "Начальный":
-              return (
-                <span style={{ color: "#D13D3D", fontWeight: "600" }}>
-                  {lang?.slice(0, 4)}
-                </span>
-              );
-            default:
-              return (
-                <span style={{ color: "#1E8E14", fontWeight: "600" }}>
-                  {lang?.slice(0, 4)}
-                </span>
-              );
-          }
-        };
         return (
           <ul>
             <li className="li d-flex align-center gap-x-2">
@@ -152,7 +264,7 @@ const Main = () => {
       key: "comp",
       align: "center",
       render: (t) => {
-        return <p>{t?.slice(0, 4)}.</p>;
+        return checkColor(t);
       },
     },
     {
@@ -252,93 +364,28 @@ const Main = () => {
       title: "Статус",
       dataIndex: "status",
       key: "status",
+      align: "center",
       render: (t, record) => {
-        const checkCase = (t) => {
-          switch (t) {
-            case "will_call":
-              return (
-                <p style={{ ...styleStatus, background: "grey" }}>Позвонить</p>
-              );
-            case "passed_first":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "steelblue",
-                  }}
-                >
-                  Прошёл 1-этап
-                </p>
-              );
-            case "failed_first":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "crimson",
-                  }}
-                >
-                  Не прошёл 1-этап
-                </p>
-              );
-            case "will_come":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "orange",
-                  }}
-                >
-                  Придёт
-                </p>
-              );
-            case "came":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "green",
-                  }}
-                >
-                  Пришел
-                </p>
-              );
-            case "failed_call":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "red",
-                  }}
-                >
-                  Не выходит на связь
-                </p>
-              );
-            case "cancel":
-              return (
-                <p
-                  style={{
-                    ...styleStatus,
-                    background: "red",
-                  }}
-                >
-                  Отказ
-                </p>
-              );
-            default:
-              return "Позвонить";
-          }
-        };
         if (role == "monitor") return checkCase(t);
         return (
-          <Select
-            onChange={(e) => handleChangeStatus(e, record)}
+          <select
+            className="status_select"
+            onChange={(e) => {
+              handleChangeStatus(e, record);
+            }}
             size="medium"
-            options={status}
-            defaultValue={t ? t : "will_call"}
-            style={{ width: "200px" }}
+            defaultValue={`${t || "will_call"}`}
+            style={styleSelect(t)}
             disabled={disabled}
-          />
+          >
+            {status?.map((item, index) => {
+              return (
+                <option key={index} value={item.value}>
+                  {item.label}
+                </option>
+              );
+            })}
+          </select>
         );
       },
     },
@@ -346,6 +393,7 @@ const Main = () => {
       title: "Примечание",
       dataIndex: "Comment",
       key: "Comment",
+      align: "center",
       render: (t, record) => {
         if (role == "monitor")
           return t ? (
@@ -369,7 +417,29 @@ const Main = () => {
           <Popover
             placement="left"
             trigger={"click"}
-            title={"Отзыв"}
+            title={
+              <div className="d-flex align-center justify-between">
+                <h3>Отзыв</h3>
+                <div className="d-flex align-center gap-x-1">
+                  <Tooltip title="Изменить">
+                    <Edit3
+                      size={17}
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setCommentModal(true), setRecord(record);
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Удалить">
+                    <Trash
+                      size={17}
+                      cursor={"pointer"}
+                      onClick={() => handleDeleteComment(record.id)}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+            }
             content={
               <div style={{ maxWidth: "500px", width: "100%" }}>
                 <p style={{ wordWrap: "break-word" }}>{t}</p>
@@ -397,7 +467,7 @@ const Main = () => {
       dispatch(
         updateUsers(
           res?.results.map((item, index) => {
-            return { index: index + 1, ...item };
+            return { index: index + 1, filter: false, ...item };
           })
         )
       ),
@@ -438,9 +508,11 @@ const Main = () => {
           showTotal: (total) => `Общий ${total} шт.`,
           onChange: (page, pageSize) => {
             getUsers(page, pageSize);
+            set("currentPage", page);
           },
           onShowSizeChange: (current, size) => {
             getUsers(current, size);
+            set("pageSize", size);
           },
         }}
       />
@@ -453,11 +525,13 @@ const Main = () => {
       />
       {/* modal comment */}
       <CommentModal
+        record={record}
         getUsers={getUsers}
         pagination={pagination}
         open={commentModal}
         close={setCommentModal}
         userId={userId}
+        setRecord={setRecord}
       />
       <ToastContainer />
     </main>

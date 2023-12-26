@@ -1,36 +1,32 @@
 import { api } from "src/utils/api";
 
-const styleForStatus = {
-  color: "#64748B",
-};
-
 export const status = [
   {
-    label: <p style={styleForStatus}>Позвонить</p>,
+    label: "Позвонить",
     value: "will_call",
   },
   {
-    label: <p style={styleForStatus}>Прошёл 1-этап</p>,
+    label: "Прошёл 1-этап",
     value: "passed_first",
   },
   {
-    label: <p style={styleForStatus}>Не прошёл 1-этап</p>,
+    label: "Не прошёл 1-этап",
     value: "failed_first",
   },
   {
-    label: <p style={styleForStatus}>Придёт</p>,
+    label: "Придёт",
     value: "will_come",
   },
   {
-    label: <p style={styleForStatus}>Пришел</p>,
+    label: "Пришел",
     value: "came",
   },
   {
-    label: <p style={styleForStatus}>Не выходит на связь</p>,
+    label: "Не выходит на связь",
     value: "failed_call",
   },
   {
-    label: <p style={{ color: "red" }}>Отказ</p>,
+    label: "Отказ",
     value: "cancel",
   },
 ];
@@ -77,20 +73,63 @@ export const changeStatus = async (value, id, setDisabled) => {
 /**
  * @param {string}  value or number and it sorting by name or phone data
  * @param {string}  status it also takes value of status and getting data from api
+ * @param {Object}  pagination when user sends empty input value that returns with remembered pagination
  */
 // filterData
-export const filterData = async (value, status) => {
-  try {
-    let param;
-    if (!isNaN(value)) {
-      param = { name: "null", phone: value, status };
-    } else {
-      param = { name: value, phone: "null", status };
-    }
-    const res = await api.get("/users/findByFilter/users", { params: param });
+export const filterData = async (value, status, pagination, pageSize) => {
+  if (pagination) {
+    try {
+      let param;
+      if (!isNaN(value)) {
+        param = {
+          name: "null",
+          phone: value,
+          status,
+          pageNumber: pagination.current,
+          pageSize: pagination.pageSize,
+        };
+      } else {
+        param = {
+          name: value,
+          phone: "null",
+          status,
+          pageNumber: pagination.current,
+          pageSize: pagination.pageSize,
+        };
+      }
+      const res = await api.get("/users/findByFilter/users", { params: param });
 
-    return res.data;
+      return res.data;
+    } catch (err) {
+      console.log(err, "err");
+    }
+  } else {
+    try {
+      let param;
+      if (!isNaN(value)) {
+        param = { name: "null", phone: value, status, pageNumber: 1, pageSize };
+      } else {
+        param = { name: value, phone: "null", status, pageNumber: 1, pageSize };
+      }
+      const res = await api.get("/users/findByFilter/users", { params: param });
+
+      return res.data;
+    } catch (err) {
+      console.log(err, "err");
+    }
+  }
+};
+
+// API's for Comment
+
+// delete comment
+export const deleteComment = async (id) => {
+  try {
+    const res = await api.patch(`/admin/updateClearComment/${id}`);
+
+    return { res, status: 200 };
   } catch (err) {
     console.log(err, "err");
+    throw Promise.reject(err);
   }
 };

@@ -1,7 +1,6 @@
 import "./style.scss";
 import Logo from "src/assets/svg/customer-service-fill.svg";
-import ForwardIcon from "src/assets/svg/share-forward-line.svg";
-import { Search } from "react-feather";
+import { Download, Search } from "react-feather";
 import { Button, Divider, Input, Select } from "antd";
 import useData from "src/service/hooks/useData";
 import { useRef } from "react";
@@ -10,8 +9,10 @@ import { filterData } from "src/pages/Error/Main/helper";
 import useLoading from "src/service/hooks/useLoading";
 import DownloadExcel from "../Excel";
 import usePagination from "src/service/hooks/usePagination";
+import { useLocalStorage } from "src/service/hooks/useLocalStorage";
 
 const Header = () => {
+  const { get } = useLocalStorage();
   const { pagination, setPagination } = usePagination();
   const inputRef = useRef();
   const [selectStatus, setSelectStatus] = useState(null);
@@ -56,19 +57,39 @@ const Header = () => {
   const handleFilter = async () => {
     setLoading(true);
     const value = inputRef?.current.input.value;
-    const res = await filterData(value, selectStatus);
-    setPagination({
-      current: +res?.pagination.currentPage,
-      pageSize: +res?.pagination.pageSize,
-      total: +res?.pagination.totalItems,
-    });
-    setData(
-      res?.results.map((item, index) => ({
-        ...item,
-        key: item.id,
-        index: index + 1,
-      }))
-    );
+    if (value == "") {
+      const pagination = {
+        current: get("currentPage"),
+        pageSize: get("pageSize"),
+      };
+      const res = await filterData(value, selectStatus, pagination);
+      setPagination({
+        current: +res?.pagination.currentPage,
+        pageSize: +res?.pagination.pageSize,
+        total: +res?.pagination.totalItems,
+      });
+      setData(
+        res?.results.map((item, index) => ({
+          ...item,
+          key: item.id,
+          index: index + 1,
+        }))
+      );
+    } else {
+      const res = await filterData(value, selectStatus, null, pagination.total);
+      setPagination({
+        current: +res?.pagination.currentPage,
+        pageSize: +res?.pagination.pageSize,
+        total: +res?.pagination.totalItems,
+      });
+      setData(
+        res?.results.map((item, index) => ({
+          ...item,
+          key: item.id,
+          index: index + 1,
+        }))
+      );
+    }
     setLoading(false);
   };
 
@@ -93,7 +114,7 @@ const Header = () => {
         <img src={Logo} alt="logo" />
         <p>Админ панель HR бота Контактного центра</p>
       </section>
-      <section className="filter d-flex align-center gap-x-3  ">
+      <section className="filter d-flex align-center justify-between gap-x-3  ">
         <Input
           allowClear
           type="search"
@@ -117,7 +138,7 @@ const Header = () => {
           style={{ color: "black", height: "3rem" }}
         />
         <div className="filter__select d-flex align-center gap-x-2">
-          <p>Сортировка по статусу</p>
+          <p>Фильтр по статусу:</p>
           <Select
             onChange={handleChangeStatus}
             style={{ width: "100%" }}
@@ -127,9 +148,10 @@ const Header = () => {
         </div>
         <section className=" d-flex justify-end align-center gap-x-1">
           <Button
+            style={{ background: "green", color: "#fff" }}
             onClick={() => DownloadExcel(setLoading, pagination.total)}
             className="d-flex align-center"
-            icon={<img src={ForwardIcon} alt="excel" />}
+            icon={<Download size={16} />}
           >
             Экспортировать в Excel
           </Button>
