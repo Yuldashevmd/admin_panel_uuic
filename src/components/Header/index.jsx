@@ -10,11 +10,13 @@ import useLoading from "src/service/hooks/useLoading";
 import DownloadExcel from "../Excel";
 import usePagination from "src/service/hooks/usePagination";
 import { useLocalStorage } from "src/service/hooks/useLocalStorage";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { get } = useLocalStorage();
   const { pagination, setPagination } = usePagination();
   const inputRef = useRef();
+  const navigate = useNavigate();
   const [selectStatus, setSelectStatus] = useState(null);
   const { setData } = useData();
   const { setLoading } = useLoading();
@@ -50,6 +52,10 @@ const Header = () => {
     {
       label: "Отказ",
       value: "cancel",
+    },
+    {
+      label: "Принят на работу",
+      value: "hired",
     },
   ];
 
@@ -137,6 +143,12 @@ const Header = () => {
     }
   };
 
+  // LOG-OUT
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate("/login");
+  };
+
   return (
     <header className="header d-flex align-center justify-between gap-x-3">
       <section className="logo d-flex justify-center align-center gap-x-2">
@@ -186,6 +198,9 @@ const Header = () => {
           >
             Экспортировать в Excel
           </Button>
+        </section>
+        <section>
+          <Button onClick={handleLogout}>Выйти</Button>
         </section>
       </section>
     </header>

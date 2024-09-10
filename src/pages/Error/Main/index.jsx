@@ -127,6 +127,17 @@ const checkCase = (t) => {
           Отказ
         </p>
       );
+    case "hired":
+      return (
+        <p
+          style={{
+            ...styleStatus,
+            background: "green",
+          }}
+        >
+          Принят на работу
+        </p>
+      );
     default:
       return "Позвонить";
   }
@@ -184,6 +195,8 @@ const Main = () => {
         return { background: "red" };
       case "cancel":
         return { background: "red" };
+      case "hired":
+        return { background: "green" };
       default:
         return { background: "grey" };
     }

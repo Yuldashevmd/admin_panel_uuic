@@ -29,6 +29,10 @@ export const status = [
     label: "Отказ",
     value: "cancel",
   },
+  {
+    label: "Принят на работу",
+    value: "hired",
+  },
 ];
 
 /**
