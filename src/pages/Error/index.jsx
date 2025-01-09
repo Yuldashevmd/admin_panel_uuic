@@ -11,7 +11,7 @@ function ErrorBoundary() {
     >
       <h1 style={{ fontSize: "74px" }}>{error?.status}</h1>
       <h2>{error.data?.sorry}</h2>
-      <h2 className="m-y-2">Oops! something went wrong mate...</h2>
+      <h2 className="m-y-2">Oops! something went wrong...</h2>
       <Link to="/" className="m-y-2">
         <Button>Back to home</Button>
       </Link>
