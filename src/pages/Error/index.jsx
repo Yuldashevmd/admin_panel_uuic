@@ -13,7 +13,7 @@ function ErrorBoundary() {
       <h2>{error.data?.sorry}</h2>
       <h2 className="m-y-2">Oops! something went wrong...</h2>
       <Link to="/" className="m-y-2">
-        <Button>Back to home </Button>
+        <Button>Back to home 1</Button>
       </Link>
     </div>
   );
